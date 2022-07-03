@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from hasker.secrets import DB_USER, DB_PASSWORD, SECRET_KEY
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -20,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!_mf-quh8k#@@)j*sbs(ndj__c!h$4r5^485!laf*%w=f)kxhf'
+SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -83,8 +85,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'HOST': 'localhost',
         'NAME': 'hasker',
-        'USER': 'svyatoslavmamzin',
-        'PASSWORD': 'password1',
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
         'PORT': '5432'
     }
 }

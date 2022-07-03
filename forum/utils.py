@@ -3,9 +3,7 @@ from PIL import Image
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
-#from hasker.secrets import HASKER_SERVICE_MAIL todo
-
-HASKER_SERVICE_MAIL = 'yoko11.06.92@yandex.ru'  # todo
+from hasker.secrets import HASKER_SERVICE_MAIL
 
 
 def crop_square(image_field, img_type):
