@@ -6,7 +6,7 @@ prod:
 	apt-get install -y postgresql
 	apt-get install -y postgresql-contrib
 	service postgresql start
-	sudo -u postgres psql -f deploy/setup_db.sql -v user=${HASKER_DB_USER} -v pwd=${HASKER_DB_PASSWORD}
+	sudo -u postgres psql -f deploy/setup_db.sql -v user=svyatoslavmamzin -v pwd=password1
 	apt-get install -y nginx
 	rm /etc/nginx/sites-enabled/default
 	cp deploy/hasker_nginx.conf /etc/nginx/conf.d/hasker_nginx.conf
