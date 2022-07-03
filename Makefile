@@ -4,7 +4,6 @@ prod:
 	pip3 install --upgrade pip
 	pip3 install -r requirements.txt
 	apt-get install -y postgresql
-	apt-get install -y postgresql-server-dev-9.5
 	apt-get install -y postgresql-contrib
 	service postgresql start
 	sudo -u postgres psql -f deploy/setup_db.sql -v user=${HASKER_DB_USER} -v pwd=${HASKER_DB_PASSWORD}
