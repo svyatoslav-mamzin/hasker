@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+{% load addcss %}
+ <ul class="list-group main-section">
+  <li class="list-group-item question-page-li">
+    <ul class="list-inline no-dot">
+      <li class="list-inline-item"><img src="{{ question.author.profile.avatar.url }}" class="question-avatar"></li>
+      <li class="list-inline-item question-user">{{question.author.first_name}}&nbsp;{{question.author.last_name}}</li>
+      <li class="list-inline-item question-username">@{{question.author.username}}</li>
+    </ul>
+  </li>
+  <li class="list-group-item question-page">
+    <div class="row">
+      <div class="col-md-12 question-page-tag-block">
+        {% for tag in question.tags.all %}
+          <span class="tag"><a href="/tag/{{tag|lower}}/">{{tag|upper}}</a></span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 question-page-title-block">
+        <span class="question-page-title">{{question.title}}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 question-content">
+        {{question.content}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 question-created">
+        <ul class="list-inline">
+          <li class="list-inline-item">Created {{forum.created|date:"d M"}}</li>
+        </ul>
+      </div>
+      <div class="col-md-6 question-vote">
+        <div class="btn-group" role="group" aria-label="Basic example">
+
+          {% if user.is_authenticated %}
+          <button type="button" id="{{question.id}}" class="btn btn-sm {% if user in question.dislikes.all %}btn-dark{% else %}btn-outline-dark{% endif %} btn-question-dislike"><i data-feather="minus"></i></button>
+          {% endif %}
+          
+          <div  id="qrate_{{question.id}}" class="btn btn-sm {% if question.rating >= 0 %}btn-outline-success{% else %}btn-outline-danger{% endif %} rate-area">{{question.rating}}</div>
+
+          {% if user.is_authenticated %}
+          <button type="button" id="{{question.id}}" class="btn btn-sm {% if user in question.likes.all %}btn-dark{% else %}btn-outline-dark{% endif %} btn-question-like"><i data-feather="plus"></i></button>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item answers-title">
+    Answers ({{answers.count}})
+  </li>
+  <li class="list-group-item answers-section">
+
+    <ul class="list-group answers">
+      
+      {% for answer in answers %}
+      <li class="list-group-item answer">
+          <div class="row answer-row">
+            <div class="col-md-1 answer-avatar">
+              <img src="{{ answer.author.profile.avatar.url }}" class="question-avatar">
+            </div>
+            <div class="col-md-11 answer-user">
+              {{answer.author.first_name}}&nbsp;{{answer.author.last_name}}
+              
+              <span class="answer-username">@{{answer.author.username}}</span>
+            </div>
+          </div>
+          <div class="row answer-row">
+            <div class="col-md-1 answer-avatar"></div>
+            <div class="col-md-11 answer-content">
+              {{answer.content}}
+            </div>
+          </div>
+        <div class="row">
+          <div class="col-md-1 answer-avatar"></div>
+          <div class="col-md-11 answer-created">Created {{answer.created|date:"d M h m s T"}}</div>
+        </div>
+        <div class="row">
+          <div class="col-md-1 answer-avatar"></div>
+          <div class="col-md-11 answer-vote">
+            <div class="btn-group" role="group" aria-label="Rating group">
+
+              {% if user.is_authenticated %}
+              <button type="button" id="{{answer.id}}" class="btn btn-sm {% if user in answer.dislikes.all %}btn-dark{% else %}btn-outline-dark{% endif %} btn-answer-dislike">
+                <i data-feather="minus"></i></button>
+              {% endif %}
+              
+              <div id="arate_{{answer.id}}" class="btn btn-sm {% if answer.rating >= 0 %}btn-outline-success{% else %}btn-outline-danger{% endif %} rate-area">{{answer.rating}}</div>
+
+              {% if user.is_authenticated %}
+              <button type="button" id="{{answer.id}}" class="btn btn-sm {% if user in answer.likes.all %}btn-dark{% else %}btn-outline-dark{% endif %} btn-answer-like"><i data-feather="plus"></i></button>
+              {% endif %}
+            </div>
+
+            {% if answer.is_solution %}
+            <button type="button" class="btn btn-sm btn-success btn-solution" disabled>
+              <i data-feather="check"></i>&nbsp;Marked as solution</button>
+            {% else %}
+              {% if is_owner %}
+              <button type="button" id="{{answer.id}}" class="btn btn-sm btn-outline-success btn-solution ajax_solution_button sol_{{answer.id}}">
+              Mark as solution</button>
+              {% endif %}
+
+            {% endif %}
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+
+    </ul>
+  </li>
+  {% if user.is_authenticated %}
+  <li class="list-group-item your-answer-title">
+    Your Answer
+  </li>
+  <li class="list-group-item your-answer-form">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="your-answer-textarea-label" for="{{form.content.id_for_label}}">Enter your answer here:</label>
+        {{form.content|addcss:"form-control"}}
+      <!-- <textarea class="form-control your-answer-textarea" id="exampleFormControlTextarea1" rows="10"></textarea> -->
+      </div>
+      <button type="submit" class="btn btn-success">Send Answer</button>
+    </form>
+  </li>
+  {% else %}
+  <li class="list-group-item your-answer-title">
+    &nbsp;
+  </li>
+  <li class="list-group-item your-answer-form">
+    &nbsp;
+  </li>
+  {% endif   %}
+ </ul>
+ 
+{% endblock %}

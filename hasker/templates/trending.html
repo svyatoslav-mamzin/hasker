@@ -1,0 +1,27 @@
+{% if trending %}
+{% load cache %}
+{% cache 3600 trending %}
+<h3 class="trending-h">Trending</h3>  
+<ul class="list-group">
+  {% for question in trending %}
+  <li class="list-group-item trending-li">
+    <div class="row">
+      <div class="col-md-12 trending-title-block">
+        <a href="/q/{{question.id}}/">
+        <span class="trending-title">{{question.title}}</span>
+      </a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="list-inline trending-meta">
+          <li class="list-inline-item">{{question.votes}} vote{{ question.votes|pluralize:" ,s" }}</li>
+          <li class="list-inline-item">{{ question.answers.count }} answer{{ question.answers.count|pluralize:" ,s" }}</li>
+        </ul>
+      </div>
+    </div>
+  </li>
+  {% endfor %}
+ </ul>
+ {% endcache %}
+{% endif %}

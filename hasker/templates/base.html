@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}} - Hasker</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/static/assets/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/assets/tagsinput.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+{% include 'navbar.html' %}
+
+<div class="container-fluid">
+  <div class="row">
+
+    {% include 'sidebar.html' %}
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 h-100">
+          <div class="container-fluid main-container h-100">
+            <div class="row h-100">
+              <div class="col-md-8 h-100">
+
+                {% block content %}{% endblock %}
+
+              </div>
+              <div class="col-md-4 h-100 trending">
+                {% include 'trending.html' %}
+              </div>
+            </div>
+           </div>
+        </main>
+  </div>
+</div>
+
+    <script src="/static/assets/jquery-3.3.1.min.js"></script>
+    <script src="/static/assets/bootstrap.min.js"></script>
+    <script src="/static/assets/tagsinput.js"></script>
+    <!-- Icons -->
+    <script src="/static/assets/feather.min.js"></script>
+    <script>
+      feather.replace();
+    </script>
+    <script src="/static/js/scripts.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<ul class="nav nav-pills main-title">
+  <li class="nav-item">
+    <div class="nav-link active"><h3>Search: </h3></div>
+  </li>
+  <li class="nav-item">
+    <div class="nav-link"><h4>"{{search_query}}"</h4></div>
+  </li>
+  <li class="nav-item">
+    <div class="nav-link"><h4>Found: {{count}} questions.</h4></div>
+  </li>
+</ul>
+{% include 'forum/question_list.html' %}
+{% if not questions %}
+<h3 class="no_objects"> По вашему запросу ничего не найдено. </h3>
+{% endif %}
+
+{% endblock %}
