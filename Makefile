@@ -6,9 +6,9 @@ prod:
 	apt-get install -y postgresql
 	apt-get install -y postgresql-contrib
 	service postgresql start
-	sudo -u postgres psql -f deploy/setup_db.sql -v user=user -v pwd=123456789
+	sudo -u postgres psql -f deploy/setup_db.sql -v user=user_db -v pwd=123456789
 	apt-get install -y nginx
-	rm /etc/nginx/sites-enabled/default
+	rm -f /etc/nginx/sites-enabled/default
 	cp deploy/hasker_nginx.conf /etc/nginx/conf.d/hasker_nginx.conf
 	cp deploy/uwsgi_params uwsgi_params
 	/etc/init.d/nginx start
