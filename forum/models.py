@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-AVATAR_DEFAULT = 'users/avatar.jpeg'
+AVATAR_DEFAULT = 'users/avatar_def.jpeg'
 
 
 class Profile(models.Model):
