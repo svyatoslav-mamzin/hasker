@@ -5,6 +5,9 @@ prod:
 	pip3 install -r requirements.txt
 	apt-get install -y postgresql
 	apt-get install -y postgresql-contrib
+	export DB_USER=user_db DB_PASSWORD=123456789
+	export SECRET_KEY="g5kl0(6*_xpg)=f*cz3)&eg0m#g6bwa^dlct%yh2arvo4nyl_1"
+	export HASKER_SERVICE_MAIL=yoko11.06.92@yandex.ru
 	service postgresql start
 	sudo -u postgres psql -f deploy/setup_db.sql -v user=user_db -v pwd=123456789
 	apt-get install -y nginx
