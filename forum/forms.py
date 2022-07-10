@@ -3,9 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
 from forum.utils import crop_square
-from forum.models import Profile, Question, Answer, Tag
+from forum.models import Profile, Question, Answer
 
 
 class SignUpForm(UserCreationForm):
