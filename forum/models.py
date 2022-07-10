@@ -21,7 +21,7 @@ class Profile(models.Model):
         return AVATAR_DEFAULT
 
     def __str__(self):
-        return "{}".format(self.user.username)
+        return f"{self.user.username}"
 
 
 @receiver(post_save, sender=User)
@@ -39,7 +39,7 @@ class Tag(models.Model):
     tagword = models.CharField(max_length=64)
 
     def __str__(self):
-        return "{}".format(self.tagword)
+        return f"{self.tagword}"
 
 
 class Question(models.Model):
@@ -58,7 +58,7 @@ class Question(models.Model):
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
     def __str__(self):
-        return "{}".format(self.title[:50])
+        return f"{self.title[:50]}"
 
 
 class Answer(models.Model):
@@ -75,5 +75,5 @@ class Answer(models.Model):
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
     def __str__(self):
-        return "{}".format(self.content[:50])
+        return f"{self.content[:50]}"
 
