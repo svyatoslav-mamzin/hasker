@@ -4,7 +4,10 @@ Django settings for hasker project.
 import os
 from pathlib import Path
 
-from hasker.secrets import DB_USER, DB_PASSWORD, SECRET_KEY
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+HASKER_SERVICE_MAIL = os.environ.get("HASKER_SERVICE_MAIL")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

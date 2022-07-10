@@ -2,8 +2,7 @@ from io import BytesIO
 from PIL import Image
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-
-from hasker.secrets import HASKER_SERVICE_MAIL
+from django.conf import settings
 
 
 def crop_square(image_field, img_type):
@@ -33,7 +32,7 @@ def send_answer_mail(to, username, post_id, question_title):
     send_mail(
         subject,
         message,
-        HASKER_SERVICE_MAIL,
+        settings.HASKER_SERVICE_MAIL,
         [to,],
         fail_silently=True,
     )
