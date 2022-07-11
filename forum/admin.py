@@ -1,15 +1,5 @@
 from django.contrib import admin
-from forum.models import Profile, Question, Answer, Tag
-
-
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Profile._meta.fields]
-
-    class Meta:
-        model = Profile
-
-
-admin.site.register(Profile, ProfileAdmin)
+from forum.models import Question, Answer, Tag
 
 
 class QuestionAdmin(admin.ModelAdmin):

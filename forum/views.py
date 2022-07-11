@@ -2,15 +2,14 @@ import json
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
 from django.contrib.postgres.search import SearchVector
-from forum.forms import SignUpForm, UserUpdateForm, UserProfileForm, NewQuestionForm, NewAnswerForm
-from forum.models import Profile, Tag, Question, Answer, AVATAR_DEFAULT
+from forum.forms import NewQuestionForm, NewAnswerForm
+from forum.models import Tag, Question, Answer
 from forum.utils import send_answer_mail
 
 
@@ -99,29 +98,6 @@ def question(request, uid):
 
 @login_required
 @transaction.atomic
-def profile(request):
-    if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            return redirect('user_profile')
-        else:
-            pass
-    else:
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = UserProfileForm(instance=request.user.profile)
-    return render(request, 'forum/profile.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'title': f'@{request.user.username} Profile',
-        'trending': _get_trending(),
-    })
-
-
-@login_required
-@transaction.atomic
 def ask(request):
     if request.method == 'POST':
         form = NewQuestionForm(request.POST)
@@ -147,32 +123,6 @@ def ask(request):
         'title': 'Ask',
         'trending': _get_trending(),
     })
-
-
-def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('index')
-    else:
-        form = SignUpForm()
-    return render(request, 'registration/signup.html', {'form': form,
-                                                        'title': 'Sign Up',
-                                                        'trending': _get_trending(),
-                                                        })
-
-
-@login_required
-def set_default_avatar(request):
-    user_profile = Profile.objects.get(user=request.user)
-    user_profile.avatar = AVATAR_DEFAULT
-    user_profile.save()
-    return redirect('user_profile')
 
 
 @login_required

@@ -4,9 +4,9 @@ Django settings for hasker project.
 import os
 from pathlib import Path
 
-DB_USER = os.environ.get("DB_USER")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
-SECRET_KEY = os.environ.get("SECRET_KEY")
+DB_USER = os.environ.get("DB_USER", 'svyatoslavmamzin')
+DB_PASSWORD = os.environ.get("DB_PASSWORD", 'password1')
+SECRET_KEY = os.environ.get("SECRET_KEY", 'asfsdfdsfkdsnfskfnskfsk')
 HASKER_SERVICE_MAIL = os.environ.get("HASKER_SERVICE_MAIL")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'forum'
+    'forum',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -102,7 +103,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "static", "media")
-STATICFILES_DIRS = ( os.path.join(BASE_DIR, "static", "static_dev"),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static", "static_dev"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static", "static_prod")
 
 # Default primary key field type
