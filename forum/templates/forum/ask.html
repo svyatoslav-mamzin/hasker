@@ -17,7 +17,7 @@
   </div>
   <div class="form-group">
     <label class="new-question-form-label" for="{{form.tags.id_for_label}}">Question Tags</label>
-    {{ form.tags|addtagfield:"At least one tag, max 5 tags, comma separated."}}
+    {{ form.tags|addtagfield:"At least one tag, max 3 tags, comma separated."}}
 
   {% if form.tags.errors %}
     {% for error in form.tags.errors %}

@@ -47,7 +47,7 @@ ROOT_URLCONF = 'hasker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates'), ],
+        'DIRS': [os.path.join(os.path.abspath(os.path.dirname(__file__)), '../forum/templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
