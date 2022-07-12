@@ -13,14 +13,14 @@ class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
 
     class Meta:
-        model = User
+        model = Profile
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
 
 
 class UserUpdateForm(forms.ModelForm):
 
     class Meta:
-        model = User
+        model = Profile
         # Add all the fields you want a user to change
         fields = ('first_name', 'last_name', 'email')
 

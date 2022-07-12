@@ -13,7 +13,7 @@ from user.models import Profile, AVATAR_DEFAULT
 def profile(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -22,7 +22,7 @@ def profile(request):
             pass
     else:
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = UserProfileForm(instance=request.user.profile)
+        profile_form = UserProfileForm(instance=request.user)
     return render(request, 'profile.html', {
         'user_form': user_form,
         'profile_form': profile_form,

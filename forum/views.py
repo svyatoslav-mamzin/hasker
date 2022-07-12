@@ -1,7 +1,5 @@
 import json
 from datetime import datetime, timedelta
-
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -11,6 +9,7 @@ from django.contrib.postgres.search import SearchVector
 from forum.forms import NewQuestionForm, NewAnswerForm
 from forum.models import Tag, Question, Answer
 from forum.utils import send_answer_mail
+from user.models import Profile
 
 
 def index(request):
@@ -71,21 +70,21 @@ def question(request, uid):
         form = NewAnswerForm(request.POST)
         if form.is_valid():
             pub = form.save(commit=False)
-            pub.author = User.objects.get(username=request.user)
+            pub.author = Profile.objects.get(username=request.user)
             pub.question = Question.objects.get(pk=uid)
             pub.save()
             send_answer_mail(to=pub.question.author.email, username=pub.question.author.username,
                              post_id=uid, question_title=pub.question.title)
             return redirect('question', uid)
     else:
-        queryset = Question.objects.select_related('author', 'author__profile').prefetch_related('likes', 'dislikes')
+        queryset = Question.objects.select_related('author').prefetch_related('likes', 'dislikes')
 
         question = get_object_or_404(queryset, pk=uid)
 
         title = question.title
         is_owner = question.author.id == request.user.id
         # '-rating' change to 'created'
-        answers = Answer.objects.filter(question__id=uid).select_related('author',  'author__profile')\
+        answers = Answer.objects.filter(question__id=uid).select_related('author')\
             .prefetch_related('likes', 'dislikes').order_by('-is_solution', 'created')
         form = NewAnswerForm()
         return render(request, 'forum/q.html', {'title': title,
@@ -103,7 +102,7 @@ def ask(request):
         form = NewQuestionForm(request.POST)
         if form.is_valid():
             pub = form.save(commit=False)
-            pub.author = User.objects.get(username=request.user)
+            pub.author = Profile.objects.get(username=request.user)
             pub.save()
             pub.tags.clear()
 

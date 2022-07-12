@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from user.models import Profile
 
 
 class Tag(models.Model):
@@ -10,14 +10,14 @@ class Tag(models.Model):
 
 
 class Question(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     content = models.TextField()
     tags = models.ManyToManyField(Tag, verbose_name="list of tags",
                                   blank=True, default=None)
-    likes = models.ManyToManyField(User, verbose_name="q_liked from",
+    likes = models.ManyToManyField(Profile, verbose_name="q_liked from",
                                    default=None, related_name="q_liked_from")
-    dislikes = models.ManyToManyField(User, verbose_name="q_disliked from",
+    dislikes = models.ManyToManyField(Profile, verbose_name="q_disliked from",
                                       default=None, related_name="q_disliked_from")
     rating = models.IntegerField(default=0)
     votes = models.IntegerField(default=0)
@@ -29,13 +29,13 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     content = models.TextField()
     is_solution = models.BooleanField(default=False)
-    likes = models.ManyToManyField(User, verbose_name="a_liked from",
+    likes = models.ManyToManyField(Profile, verbose_name="a_liked from",
                                    default=None, related_name="a_liked_from")
-    dislikes = models.ManyToManyField(User, verbose_name="a_disliked from",
+    dislikes = models.ManyToManyField(Profile, verbose_name="a_disliked from",
                                       default=None, related_name="a_disliked_from")
     rating = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
