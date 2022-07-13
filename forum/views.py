@@ -113,15 +113,9 @@ def ask(request):
                 pub.tags.add(obj)
             pub.save()
             return redirect('question', pub.id)
-        else:
-            print(form.errors)
     else:
         form = NewQuestionForm(instance=request.user)
-    return render(request, 'forum/ask.html', {
-        'form': form,
-        'title': 'Ask',
-        'trending': _get_trending(),
-    })
+    return render(request, 'forum/ask.html', {'form': form, 'title': 'Ask', 'trending': _get_trending()})
 
 
 @login_required
