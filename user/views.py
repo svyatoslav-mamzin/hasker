@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect
-
+from django.conf import settings
 from forum.views import _get_trending
 from user.forms import UserUpdateForm, UserProfileForm, SignUpForm
-from user.models import Profile, AVATAR_DEFAULT
+from user.models import Profile
 
 
 @login_required
@@ -52,7 +52,7 @@ def signup(request):
 @login_required
 def set_default_avatar(request):
     user_profile = Profile.objects.get(user=request.user)
-    user_profile.avatar = AVATAR_DEFAULT
+    user_profile.avatar = settings.AVATAR_DEFAULT
     user_profile.save()
     return redirect('user_prof')
 

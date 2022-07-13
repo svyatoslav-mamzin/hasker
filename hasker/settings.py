@@ -4,9 +4,9 @@ Django settings for hasker project.
 import os
 from pathlib import Path
 
-DB_USER = os.environ.get("DB_USER", 'svyatoslavmamzin')
-DB_PASSWORD = os.environ.get("DB_PASSWORD", 'password1')
-SECRET_KEY = os.environ.get("SECRET_KEY", 'asfsdfdsfkdsnfskfnskfsk')
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 HASKER_SERVICE_MAIL = os.environ.get("HASKER_SERVICE_MAIL")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,4 +116,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 MAX_NUM_TAGS = 3
 
 AUTH_USER_MODEL = 'user.Profile'
+
+AVATAR_DEFAULT = 'users/avatar_def.jpeg'
 
