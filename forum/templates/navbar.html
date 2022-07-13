@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-  <a class="navbar-brand col-md-2" href="/">HASKER</a>
+  <a class="navbar-brand col-md-2" href="{% url 'index'%}?next={{request.path}}">HASKER</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -10,12 +10,12 @@
     </form>
     <ul class="navbar-nav ml-auto justify-content-around">
     	 <li class="nav-item">
-    <a href="/ask">
+    <a href="{% url 'ask'%}?next={{request.path}}">
     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Ask Question!</button>
 	</a>
 </li>
  <li class="nav-item">
-    <a class="btn btn-outline-primary my-2 my-sm-0 d-lg-none" href="/user">Profile</a>
+    <a class="btn btn-outline-primary my-2 my-sm-0 d-lg-none" href="{% url 'user_prof'%}?next={{request.path}}">Profile</a>
 </li>
 </ul>
   </div>

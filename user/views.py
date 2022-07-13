@@ -17,7 +17,7 @@ def profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile')
+            return redirect('user_prof')
         else:
             pass
     else:
@@ -54,5 +54,5 @@ def set_default_avatar(request):
     user_profile = Profile.objects.get(user=request.user)
     user_profile.avatar = AVATAR_DEFAULT
     user_profile.save()
-    return redirect('user_profile')
+    return redirect('user_prof')
 

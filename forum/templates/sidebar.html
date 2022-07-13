@@ -9,7 +9,7 @@
         {{ user.first_name }}&nbsp;{{ user.last_name }}&nbsp;
       </li>
       <li class="nav-item loggedin-li loggedin-name">
-        <a class="nav-link active  signup" href="/user">
+        <a class="nav-link active  signup" href="{% url 'user_prof'%}?next={{request.path}}">
           <i data-feather="settings"></i>
         {{ user.get_username }}
       </li>
@@ -32,7 +32,7 @@
         <span>&nbsp;</span>
       </li>
       <li class="nav-item loggedin-li">
-        <a class="nav-link active  signup" href="/signup/">
+        <a class="nav-link active  signup" href="{% url 'signup'%}?next={{request.path}}">
           <i data-feather="chevrons-right"></i>
           Sign Up
         </a>
