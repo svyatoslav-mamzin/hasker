@@ -6,44 +6,55 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
 from django.contrib.postgres.search import SearchVector
+from django.utils.decorators import method_decorator
+from django.views import View
 from forum.forms import NewQuestionForm, NewAnswerForm
 from forum.models import Tag, Question, Answer
 from forum.utils import send_answer_mail
 from user.models import Profile
 
 
-def index(request):
-    questions = Question.objects.all().select_related('author').prefetch_related('tags', 'answers').order_by('-votes')
-    paginator = Paginator(questions, 20)
-    page = request.GET.get('page')
-    questions = paginator.get_page(page)
-    return render(request, 'forum/index.html', {'questions': questions,
-                                                    'title': 'Home',
-                                                    'trending': _get_trending(),})
+class IndexView(View):
+    paginate_by = 20
+    template_name = 'forum/index.html'
+    order_by = ('-votes',)
+    title = 'Home'
+
+    def get(self, request, *args, **kwargs):
+        questions = Question.objects.all().select_related('author').prefetch_related('tags', 'answers')\
+                                                                                .order_by(*self.order_by)
+        paginator = Paginator(questions, self.paginate_by)
+        page = request.GET.get('page')
+        questions = paginator.get_page(page)
+        return render(request, self.template_name, {'questions': questions,
+                                                    'title': self.title,
+                                                    'trending': _get_trending(), })
 
 
-def new(request):
-    questions = Question.objects.all().select_related('author').prefetch_related('tags', 'answers').order_by('-created')
-    paginator = Paginator(questions, 20)
-    page = request.GET.get('page')
-    questions = paginator.get_page(page)
-    return render(request, 'forum/new.html', {'questions': questions,
-                                                    'title': 'New Questions',
-                                                    'trending': _get_trending(),})
+class NewView(IndexView):
+    template_name = 'forum/new.html'
+    order_by = ('-created',)
+    title = 'New Questions'
 
 
-def search(request):
-    search_query = request.GET.get('q')
-    if search_query.startswith('tag:'):
-        return tag_search(request, search_query[4:])
-    searchv = SearchVector('title', 'content')
-    searchv.default_alias = 'question_search'
-    found = Question.objects.annotate(search=searchv).filter(search=search_query)\
-        .order_by('-rating', '-created')
-    paginator = Paginator(found, 20)
-    page = request.GET.get('page')
-    questions = paginator.get_page(page)
-    return render(request, 'forum/search.html', {'questions': questions,
+class SearchView(View):
+    model = Question
+    args_search = ('title', 'content',)
+    order_by = ('-rating', '-created',)
+    paginate_by = 20
+    template_name = 'forum/search.html'
+
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('q')
+        if search_query.startswith('tag:'):
+            return tag_search(request, search_query[4:])
+        searchv = SearchVector(*self.args_search)
+        searchv.default_alias = 'question_search'
+        found = self.model.objects.annotate(search=searchv).filter(search=search_query).order_by(*self.order_by)
+        paginator = Paginator(found, self.paginate_by)
+        page = request.GET.get('page')
+        questions = paginator.get_page(page)
+        return render(request, self.template_name, {'questions': questions,
                                                      'title': f'Search: "{search_query}"',
                                                      'search_query': search_query,
                                                      'count': paginator.count,
@@ -64,42 +75,54 @@ def tag_search(request, tagword):
                                                   'trending': _get_trending(), })
 
 
-@transaction.atomic
-def question(request, uid):
-    if request.method == 'POST':
-        form = NewAnswerForm(request.POST)
+class QuestionView(View):
+    form = NewAnswerForm
+    prefetch_related = ('likes', 'dislikes',)
+    order_by = ('-is_solution', 'created',)
+    template_name = 'forum/q.html'
+
+    def get(self, request, uid, *args, **kwargs):
+        queryset = Question.objects.select_related('author').prefetch_related(*self.prefetch_related)
+        question = get_object_or_404(queryset, pk=uid)
+        title = question.title
+        is_owner = question.author.id == request.user.id
+        answers = Answer.objects.filter(question__id=uid).select_related('author')\
+            .prefetch_related(*self.prefetch_related).order_by(*self.order_by)
+        form = self.form()
+        return render(request, self.template_name, {'title': title,
+                                                'question': question,
+                                                'answers': answers,
+                                                'is_owner': is_owner,
+                                                'form': form,
+                                                'trending': _get_trending(), })
+
+    @method_decorator(transaction.atomic)
+    def post(self, request, uid, *args, **kwargs):
+        form = self.form(request.POST)
         if form.is_valid():
             pub = form.save(commit=False)
             pub.author = Profile.objects.get(username=request.user)
             pub.question = Question.objects.get(pk=uid)
             pub.save()
-            send_answer_mail(to=pub.question.author.email, username=pub.question.author.username,
-                             post_id=uid, question_title=pub.question.title)
+            send_answer_mail(to=pub.question.author.email,
+                             username=pub.question.author.username,
+                             post_id=uid,
+                             question_title=pub.question.title)
             return redirect('question', uid)
-    else:
-        queryset = Question.objects.select_related('author').prefetch_related('likes', 'dislikes')
-
-        question = get_object_or_404(queryset, pk=uid)
-
-        title = question.title
-        is_owner = question.author.id == request.user.id
-        # '-rating' change to 'created'
-        answers = Answer.objects.filter(question__id=uid).select_related('author')\
-            .prefetch_related('likes', 'dislikes').order_by('-is_solution', 'created')
-        form = NewAnswerForm()
-        return render(request, 'forum/q.html', {'title': title,
-                                                    'question': question,
-                                                    'answers': answers,
-                                                    'is_owner': is_owner,
-                                                    'form': form,
-                                                    'trending': _get_trending(),})
 
 
-@login_required
-@transaction.atomic
-def ask(request):
-    if request.method == 'POST':
-        form = NewQuestionForm(request.POST)
+class AskView(View):
+    form = NewQuestionForm
+    template_name = 'forum/ask.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form(instance=request.user),
+                                                    'title': 'Ask',
+                                                    'trending': _get_trending()})
+
+    @method_decorator(transaction.atomic)
+    def post(self, request, *args, **kwargs):
+        form = self.form(request.POST)
         if form.is_valid():
             pub = form.save(commit=False)
             pub.author = Profile.objects.get(username=request.user)
@@ -113,55 +136,43 @@ def ask(request):
                 pub.tags.add(obj)
             pub.save()
             return redirect('question', pub.id)
-    else:
-        form = NewQuestionForm(instance=request.user)
-    return render(request, 'forum/ask.html', {'form': form, 'title': 'Ask', 'trending': _get_trending()})
 
 
-@login_required
-def like_question(request, uid):
-    user = request.user
-    post = Question.objects.get(id=uid)
-    post.dislikes.remove(user)
-    post.likes.add(user)
-    post.rating = post.likes.count() - post.dislikes.count()
-    post.votes = post.likes.count() + post.dislikes.count()
-    post.save()
-    return HttpResponse(str(post.rating))
+class RatingBaseView(View):
+    model = Question
+    hash_attr_for_remove = 'dislikes'
+    hash_attr_for_add = 'likes'
+
+    @method_decorator(login_required)
+    def get(self, request, uid, *args, **kwargs):
+        user = request.user
+        post = self.model.objects.get(id=uid)
+        post.__getattribute__(self.hash_attr_for_remove).remove(user)
+        post.__getattribute__(self.hash_attr_for_add).add(user)
+        post.rating = post.likes.count() - post.dislikes.count()
+        if hasattr(post, 'votes'):
+            post.votes = post.likes.count() + post.dislikes.count()
+        post.save()
+        return HttpResponse(str(post.rating))
 
 
-@login_required
-def dislike_question(request, uid):
-    user = request.user
-    post = Question.objects.get(id=uid)
-    post.likes.remove(user)
-    post.dislikes.add(user)
-    post.rating = post.likes.count() - post.dislikes.count()
-    post.votes = post.likes.count() + post.dislikes.count()
-    post.save()
-    return HttpResponse(str(post.rating))
+class LikeView(RatingBaseView):
+    pass
 
 
-@login_required
-def like_answer(request, ans_uid):
-    user = request.user
-    post = Answer.objects.get(id=ans_uid)
-    post.dislikes.remove(user)
-    post.likes.add(user)
-    post.rating = post.likes.count() - post.dislikes.count()
-    post.save()
-    return HttpResponse(str(post.rating))
+class DislikeView(RatingBaseView):
+    hash_attr_for_remove = 'likes'
+    hash_attr_for_add = 'dislikes'
 
 
-@login_required
-def dislike_answer(request, ans_uid):
-    user = request.user
-    post = Answer.objects.get(id=ans_uid)
-    post.likes.remove(user)
-    post.dislikes.add(user)
-    post.rating = post.likes.count() - post.dislikes.count()
-    post.save()
-    return HttpResponse(str(post.rating))
+class LikeAnswerView(RatingBaseView):
+    model = Answer
+
+
+class DislikeAnswerView(RatingBaseView):
+    model = Answer
+    hash_attr_for_remove = 'likes'
+    hash_attr_for_add = 'dislikes'
 
 
 def send_all_tags(request):
